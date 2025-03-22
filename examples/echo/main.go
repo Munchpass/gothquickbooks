@@ -25,7 +25,8 @@ func OAuthStart(c echo.Context) error {
 		return nil
 	}
 
-	fmt.Println("user (oauth start): ", user)
+	fmt.Printf("user (oauth start): %+v\n", user)
+	fmt.Printf("raw data:\n%+v\n", user.RawData)
 	return nil
 }
 
@@ -41,6 +42,7 @@ func OAuthCallback(c echo.Context) error {
 	}
 
 	fmt.Printf("user (from callback): %+v\n", user)
+	fmt.Printf("raw data:\n%+v\n", user.RawData)
 
 	// Fetch profile
 	// Change this if you are using production key

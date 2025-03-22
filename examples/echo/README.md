@@ -5,7 +5,7 @@
 The following will start an echo server that implements the OAuth flows:
 
 ```bash
-QB_CLIENT_ID=<YOUR_CLIENT_ID> QB_CLIENT_SECRET=<YOUR_CLIENT_SECRET> go run main.go
+QB_CLIENT_ID=<YOUR_CLIENT_ID> QB_CLIENT_SECRET=<YOUR_CLIENT_SECRET> SESSION_SECRET=<YOUR_GOTH_SECRET> go run main.go
 ```
 
 Go to `http://localhost:3000/quickbooks/start` to start the OAuth flow. You'll know it worked by checking that it correctly fetched the user info properly in the server logs (stdout).

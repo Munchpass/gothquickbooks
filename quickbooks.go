@@ -41,7 +41,6 @@ func New(clientKey, secret, callbackURL string, scopes ...string) *Provider {
 		providerName: "quickbooks",
 	}
 	p.config = newConfig(p, scopes)
-	fmt.Printf("config: %+v\n", p.config)
 	return p
 }
 
@@ -81,6 +80,30 @@ func (p *Provider) BeginAuth(state string) (goth.Session, error) {
 	return session, nil
 }
 
+/*
+Use this to fetch the realm ID:
+
+	idToken, ok := user.RawData[PARSED_ID_TOKEN_USER_KEY].(IDToken)
+	if ok {
+		realmId := idToken.RealmId
+		...
+	}
+
+This will only be specified if you specify the openid scope.
+*/
+const PARSED_ID_TOKEN_USER_KEY = "id_token"
+const REFRESH_TOKEN_EXPIRES_AT_USER_KEY = "refresh_token_expires_at"
+
+type IDToken struct {
+	Sub      string   `json:"sub"`
+	Aud      []string `json:"aud"`
+	RealmId  string   `json:"realmid"`
+	AuthTime int64    `json:"auth_time"`
+	Iss      string   `json:"iss"`
+	Exp      int64    `json:"exp"`
+	Iat      int64    `json:"iat"`
+}
+
 // FetchUser will go to quickbooks and access basic information about the user.
 func (p *Provider) FetchUser(session goth.Session) (goth.User, error) {
 	s := session.(*Session)
@@ -88,8 +111,12 @@ func (p *Provider) FetchUser(session goth.Session) (goth.User, error) {
 		AccessToken:  s.AccessToken,
 		Provider:     p.Name(),
 		RefreshToken: s.RefreshToken,
-		ExpiresAt:    s.ExpiresAt,
-		UserID:       s.UserID,
+		ExpiresAt:    s.AccessTokenExpiresAt,
+		IDToken:      s.IDToken,
+		RawData: map[string]any{
+			PARSED_ID_TOKEN_USER_KEY:          s.ParsedIDToken,
+			REFRESH_TOKEN_EXPIRES_AT_USER_KEY: s.RefreshTokenExpiresAt,
+		},
 	}
 
 	if user.AccessToken == "" {
