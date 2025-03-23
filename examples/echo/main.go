@@ -94,7 +94,12 @@ func OAuthCallback(c echo.Context) error {
 	}
 	fmt.Printf("User Info Resp: %+v\n", userInfoResp)
 	log.Println("Ending GetUserInfo")
-	return nil
+	return c.Redirect(http.StatusTemporaryRedirect, "/after-callback")
+}
+
+func AfterCallback(c echo.Context) error {
+
+	return c.JSON(http.StatusOK, "You should see this after the callback redirects you.")
 }
 
 func main() {
@@ -109,6 +114,7 @@ func main() {
 	e := echo.New()
 	e.GET("/quickbooks/start", OAuthStart)
 	e.GET("/quickbooks/callback", OAuthCallback)
+	e.GET("/after-callback", AfterCallback)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }
